@@ -3,23 +3,7 @@ import shutil
 from PIL import Image, ImageEnhance
 from tqdm import tqdm
 
-def check_dataset_exist(root_path):
-    if not os.path.exists(root_path + '/Dataset'):
-        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset'}")
-    
-    if not os.path.exists(root_path + '/Dataset/images'):
-        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset/images'}")
-
-    if not os.path.exists(root_path + '/Dataset/masks'):
-        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset/masks'}")
-    
-    if not os.listdir(root_path + '/Dataset/images'):
-        raise FileNotFoundError(f"Images not found! Path used: {root_path + '/Dataset/images'}")
-    
-    if not os.listdir(root_path + '/Dataset/masks'):
-        raise FileNotFoundError(f"Masks not found! Path used: {root_path + '/Dataset/masks'}")
-
-    return True
+import util
 
 def check_save_path(root_path):
 
@@ -72,7 +56,7 @@ def greyscale(image):
 
 root_path = os.getcwd()
 
-if check_dataset_exist(root_path):
+if util.check_dataset_exist(root_path):
     os.chdir(root_path + '/Dataset/images')
     images = os.listdir()
 
@@ -105,16 +89,16 @@ if check_dataset_exist(root_path):
             flipHorizontal(mask).save(path_to_save_mask + mask_name.replace('.png', 'f.png'))
 
             brightness(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'bi.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cbi.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'bi.png'))
 
             brightness(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'bd.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cbd.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'bd.png'))
 
             contrast(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'ci.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cci.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'ci.png'))
 
             contrast(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'cd.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'ccd.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cd.png'))
 
             greyscale(image).save(path_to_save_image + image_name.replace('.png', 'g.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cg.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'g.png'))
