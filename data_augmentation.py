@@ -1,5 +1,45 @@
 import os
+import shutil
 from PIL import Image, ImageEnhance
+from tqdm import tqdm
+
+def check_dataset_exist(root_path):
+    if not os.path.exists(root_path + '/Dataset'):
+        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset'}")
+    
+    if not os.path.exists(root_path + '/Dataset/images'):
+        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset/images'}")
+
+    if not os.path.exists(root_path + '/Dataset/masks'):
+        raise FileNotFoundError(f"The path to the dataset doesn't exist! Path used: {root_path + '/Dataset/masks'}")
+    
+    if not os.listdir(root_path + '/Dataset/images'):
+        raise FileNotFoundError(f"Images not found! Path used: {root_path + '/Dataset/images'}")
+    
+    if not os.listdir(root_path + '/Dataset/masks'):
+        raise FileNotFoundError(f"Masks not found! Path used: {root_path + '/Dataset/masks'}")
+
+    return True
+
+def check_save_path(root_path):
+
+    if os.path.exists(root_path + '/Augmented Dataset'):
+        shutil.rmtree(root_path + '/Augmented Dataset')
+
+    path = root_path + '/Augmented Dataset'
+    os.mkdir(path)
+    os.mkdir(path + '/images')
+    os.mkdir(path + '/masks')
+    
+    return True
+
+def crop_save_image(image, image_name, path_to_save, cut_size):
+    index = 0
+    for i in tqdm(range(0, image.height, cut_size), desc=f'Cropping [image: {image_name}]'):
+        for j in range(0, image.width, cut_size):
+            image_name_aux = image_name.replace('.png', str(index) + '.png')
+            index += 1
+            image.crop((j, i, j + cut_size, i + cut_size)).save(path_to_save + image_name_aux)
 
 def resize(image, size):
     return image.resize((size, size))
@@ -31,50 +71,50 @@ def greyscale(image):
 
 
 root_path = os.getcwd()
-os.chdir(root_path + '/Dataset/images')
 
-images = os.listdir()
+if check_dataset_exist(root_path):
+    os.chdir(root_path + '/Dataset/images')
+    images = os.listdir()
 
-path_to_save_image = root_path + '/Augmented Dataset/images/'
-path_to_save_mask = root_path + '/Augmented Dataset/masks/'
+    if check_save_path(root_path):
+        path_to_save_image = root_path + '/Augmented Dataset/images/'
+        path_to_save_mask = root_path + '/Augmented Dataset/masks/'
 
-for i in images:
-    image = Image.open(i)
+        for image_name in tqdm(images, desc='Image cropping total completed...', leave=False):
+            image = Image.open(image_name)
 
-    mask_name = i.replace('original', 'mask')
-    mask = Image.open(os.path.dirname(os.getcwd()) + '/masks/' + mask_name)
+            mask_name = image_name.replace('original', 'mask')
+            mask = Image.open(os.path.dirname(os.getcwd()) + '/masks/' + mask_name)
 
-    resize(image, 256).save(path_to_save_image + i.replace('.png', 'a.png'))
-    resize(mask, 256).save(path_to_save_mask + mask_name.replace('.png', 'a.png'))
+            crop_save_image(image, image_name, path_to_save_image, 256)
+            crop_save_image(mask, mask_name, path_to_save_mask, 256)
 
+        os.chdir(root_path + '/Augmented Dataset/images')
+        images = os.listdir()
 
-os.chdir(root_path + '/Augmented Dataset/images')
+        for image_name in tqdm(images, desc='Total transformations...'):
+            image = Image.open(image_name)
 
-images = os.listdir()
+            mask_name = image_name.replace('original', 'mask')
+            mask = Image.open(os.path.dirname(os.getcwd()) + '/masks/' + mask_name)
 
-for i in images:
-    image = Image.open(i)
+            rotate(image, -45).save(path_to_save_image + image_name.replace('.png', 'r.png'))
+            rotate(mask, -45).save(path_to_save_mask + mask_name.replace('.png', 'r.png'))
 
-    mask_name = i.replace('originala', 'maska')
-    mask = Image.open(os.path.dirname(os.getcwd()) + '/masks/' + mask_name)
+            flipHorizontal(image).save(path_to_save_image + image_name.replace('.png', 'f.png'))
+            flipHorizontal(mask).save(path_to_save_mask + mask_name.replace('.png', 'f.png'))
 
-    rotate(image, -45).save(path_to_save_image + i.replace('a.png', 'b.png'))
-    rotate(mask, -45).save(path_to_save_mask + mask_name.replace('a.png', 'b.png'))
+            brightness(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'bi.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cbi.png'))
 
-    flipHorizontal(image).save(path_to_save_image + i.replace('a.png', 'c.png'))
-    flipHorizontal(mask).save(path_to_save_mask + mask_name.replace('a.png', 'c.png'))
+            brightness(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'bd.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cbd.png'))
 
-    brightness(image, 0.5).save(path_to_save_image + i.replace('a.png', 'd.png'))
-    mask.copy().save(path_to_save_mask + mask_name.replace('a.png', 'd.png'))
+            contrast(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'ci.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cci.png'))
 
-    brightness(image, -0.5).save(path_to_save_image + i.replace('a.png', 'e.png'))
-    mask.copy().save(path_to_save_mask + mask_name.replace('a.png', 'e.png'))
+            contrast(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'cd.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'ccd.png'))
 
-    contrast(image, 0.5).save(path_to_save_image + i.replace('a.png', 'f.png'))
-    mask.copy().save(path_to_save_mask + mask_name.replace('a.png', 'f.png'))
-
-    contrast(image, -0.5).save(path_to_save_image + i.replace('a.png', 'g.png'))
-    mask.copy().save(path_to_save_mask + mask_name.replace('a.png', 'g.png'))
-
-    greyscale(image).save(path_to_save_image + i.replace('a.png', 'h.png'))
-    mask.copy().save(path_to_save_mask + mask_name.replace('a.png', 'h.png'))
+            greyscale(image).save(path_to_save_image + image_name.replace('.png', 'g.png'))
+            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cg.png'))
