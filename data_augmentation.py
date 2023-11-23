@@ -41,8 +41,8 @@ def contrast(image, factor):
 
     return contraster.enhance(1 + factor)
 
-def greyscale(image):
-    return image.convert("L")
+def flipVertical(image):
+    return image.transpose(method=Image.Transpose.FLIP_TOP_BOTTOM)
 
 
 root_path = os.getcwd()
@@ -83,20 +83,20 @@ if util.check_dataset_exist(root_path):
             borderless_rot_mask = util.remove_unnecessary_border(mask_rot)
             borderless_rot_mask.save(path_to_save_mask + mask_name.replace('.png', 'r.png'))
 
-            flipHorizontal(image).save(path_to_save_image + image_name.replace('.png', 'f.png'))
-            flipHorizontal(mask).save(path_to_save_mask + mask_name.replace('.png', 'f.png'))
+            flipHorizontal(image).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'fh.png'))
+            flipHorizontal(mask).convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'fh.png'))
 
-            brightness(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'bi.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'bi.png'))
+            brightness(image, 0.25).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'bi.png'))
+            mask.copy().convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'bi.png'))
 
-            brightness(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'bd.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'bd.png'))
+            brightness(image, -0.25).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'bd.png'))
+            mask.copy().convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'bd.png'))
 
-            contrast(image, 0.5).save(path_to_save_image + image_name.replace('.png', 'ci.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'ci.png'))
+            contrast(image, 0.5).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'ci.png'))
+            mask.copy().convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'ci.png'))
 
-            contrast(image, -0.5).save(path_to_save_image + image_name.replace('.png', 'cd.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'cd.png'))
+            contrast(image, -0.5).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'cd.png'))
+            mask.copy().convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'cd.png'))
 
-            greyscale(image).save(path_to_save_image + image_name.replace('.png', 'g.png'))
-            mask.copy().save(path_to_save_mask + mask_name.replace('.png', 'g.png'))
+            flipVertical(image).convert('RGB').save(path_to_save_image + image_name.replace('.png', 'fv.png'))
+            flipVertical(mask).convert('RGB').save(path_to_save_mask + mask_name.replace('.png', 'fv.png'))
