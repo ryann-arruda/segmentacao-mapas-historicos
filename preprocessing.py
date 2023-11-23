@@ -2,7 +2,7 @@ import os
 from PIL import Image
 import numpy as np
 from tqdm import tqdm
-from random import shuffle
+from random import shuffle, seed
 import shutil
 
 import util
@@ -42,7 +42,7 @@ def create_folder_from_dataset(root_path, dataset_path, folder_name, image_names
         shutil.move(dataset_path + '/images/' + image_name, folder_path + '/images/')
         shutil.move(dataset_path + '/masks/' + image_name.replace('original', 'mask'), folder_path + '/masks/')
 
-def train_test_val(root_path, dataset_name='Augmented Dataset', train=0.7, test=0.2):
+def train_test_val(root_path, dataset_name='Augmented Dataset', train=0.7, test=0.2, seed_value=31):
     dataset_path = root_path + '/' + dataset_name
 
     if util.check_augmented_dataset_exist(root_path):
@@ -52,6 +52,7 @@ def train_test_val(root_path, dataset_name='Augmented Dataset', train=0.7, test=
         train_size = int(round(dataset_size * train, 0))
         test_size = int(round(dataset_size * test, 0))
 
+        seed(seed_value)
         shuffle(image_names)
 
         name_training_images = image_names[:train_size]
@@ -65,6 +66,7 @@ def train_test_val(root_path, dataset_name='Augmented Dataset', train=0.7, test=
 
         create_folder_from_dataset(root_path, dataset_path, 'validation', image_names)
 
+        os.chdir(root_path)
         shutil.rmtree(dataset_path)
         
 
