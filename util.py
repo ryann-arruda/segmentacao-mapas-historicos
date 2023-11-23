@@ -39,14 +39,13 @@ def check_augmented_dataset_exist(root_path):
     return True
 
 def remove_unnecessary_border(image):
-    img = image.copy()
-    img = img.convert('RGBA')
+    img = image.convert('RGBA')
 
     aux_image = Image.new('RGBA', img.size, (255,)*4)
 
     borderless_image = Image.composite(img, aux_image, img)
 
-    return borderless_image.convert(image.mode)
+    return borderless_image.convert('RGB')
 
 def check_save_path(root_path):
 
